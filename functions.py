@@ -1,6 +1,6 @@
 import numpy as np
 import math
-
+from scipy.stats import norm
 
 def mean(df, periode):
     """
@@ -10,7 +10,7 @@ def mean(df, periode):
     :return:
     """
     df2 = df.iloc[::periode, :].reset_index(drop=True)
-    df2["Return"] = np.log(df2['Adj Close']/df2['Adj Close'].shift(1))
+    df2["Return"] = np.log(df2["Adj Close"]/df2["Adj Close"].shift(1))
     mean_return = df2["Return"].sum()/(len(df2)-1)
     return mean_return
 
@@ -119,6 +119,17 @@ def opsi(tipe, N, S, K, interest, deltat, p, t):
     return
 
 
+def black_scholes(S, K, deltat, sigma, interest, opsi, t):
+    d1 = (math.log(S/K) + (interest + sigma**2/2)*deltat) / (sigma * math.sqrt(deltat))
+    d2 = d1 - sigma*math.sqrt(deltat)
+    if opsi.lower() == "call":
+        C = S*norm.cdf(d1) - K*math.exp(-interest*deltat)*norm.cdf(d2)
+        print(f"Harga Opsi {opsi} dengan Strike Price {K} dan waktu jatuh tempo {t} "
+              f"bulan adalah {np.round(C, 4)}")
+    elif opsi.lower() == "put":
+        P = K*math.exp(-interest*deltat)*norm.cdf(-d2) - S*norm.cdf(-d1)
+        print(f"Harga Opsi {opsi} dengan Strike Price {K} dan waktu jatuh tempo {t} "
+              f"bulan adalah {np.round(P, 4)}")
 
 
 
