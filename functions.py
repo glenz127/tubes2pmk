@@ -1,6 +1,9 @@
 import numpy as np
 import math
 from scipy.stats import norm
+import random
+import matplotlib.pyplot as plt
+
 
 def mean(df, periode):
     """
@@ -24,7 +27,7 @@ def std(df, periode):
     :return:
     """
     df2 = df.iloc[::periode, :].reset_index(drop=True)
-    mu = mean(df,periode)
+    mu = mean(df, periode)
     df2["Return"] = np.log(df2['Adj Close']/df2['Adj Close'].shift(1))
     df2["SS"] = (df2["Return"] - mu)**2
     st_dev = np.sqrt((1/(len(df2["Return"])-2))*(df2["SS"].sum()))
@@ -92,7 +95,7 @@ def opsi(tipe, N, S, K, interest, deltat, p, t):
     :param t:
     :return:
     """
-    if (tipe.lower() == "call"):
+    if tipe.lower() == "call":
         """
         Bagian Ini menghitung harga opsi Call
         """
@@ -104,7 +107,7 @@ def opsi(tipe, N, S, K, interest, deltat, p, t):
                 value[i][j] = np.round(np.exp(-interest*deltat)*(p*value[i+1][j+1] + (1-p)*value[i+1][j]), 4)
         harga_opsi = value[0][0]
         print(f"Harga Opsi {tipe} dengan Strike Price {K} dan waktu jatuh tempo {t} bulan adalah {harga_opsi}")
-    elif (tipe.lower() == "put"):
+    elif tipe.lower() == "put":
         """
         Bagian ini menghitung harga opsi Put
         """
@@ -119,7 +122,19 @@ def opsi(tipe, N, S, K, interest, deltat, p, t):
     return
 
 
-def black_scholes(S, K, deltat, sigma, interest, opsi, t):
+def black_scholes(opsi, S, K, deltat, sigma, interest, t):
+    """
+    Fungsi ini menghitung harga opsi put/call menggunakan metode Black-Scholes dengan informasi
+     data harian selama 1 tahun, untuk opsi yang jatuh tempo dalam t bulan
+    :param S:
+    :param K:
+    :param deltat:
+    :param sigma:
+    :param interest:
+    :param opsi:
+    :param t:
+    :return:
+    """
     d1 = (math.log(S/K) + (interest + sigma**2/2)*deltat) / (sigma * math.sqrt(deltat))
     d2 = d1 - sigma*math.sqrt(deltat)
     if opsi.lower() == "call":
@@ -131,6 +146,28 @@ def black_scholes(S, K, deltat, sigma, interest, opsi, t):
         print(f"Harga Opsi {opsi} dengan Strike Price {K} dan waktu jatuh tempo {t} "
               f"bulan adalah {np.round(P, 4)}")
 
+
+def monte_carlo(tipe, S0, K, t, N, deltat, mu, sigma, interest):
+    S_t_all = np.zeros((N+1, N+1))
+    S_t = np.zeros(N+1)
+    S_t[0] = S0
+    for i in range(len(S_t_all)):
+        S_t_all[i, 0]= S0
+    payoff = np.zeros(N+1)
+
+    for i in range(1, N+1):
+        for j in range(1, N+1):
+            z = np.random.standard_normal()
+            S_t[j] = S_t[j-1] * np.exp((mu-0.5*sigma**2)*deltat + sigma*np.sqrt(deltat)*z)
+            S_t_all[i, j] = S_t[j]
+        if tipe == "call":
+            payoff[i] = np.maximum(S_t_all[i, N-1]-K, 0)
+        elif tipe == "put":
+            payoff[i] = np.maximum(K - S_t_all[i, N-1], 0)
+    harga_opsi = np.round(np.exp(-interest*deltat) * np.mean(payoff), 4)
+
+    print(f"Harga opsi {tipe} dengan periode {t} bulan dan Strike Price {K} adalah {harga_opsi}.")
+    return
 
 
 
