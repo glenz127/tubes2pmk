@@ -1,9 +1,4 @@
 import pandas as pd
-import numpy as np
-import random
-import math
-from scipy.stats import norm
-import matplotlib.pyplot as plt
 import functions
 
 # Inisiasi
@@ -38,13 +33,15 @@ functions.opsi("put", N, saham, 150, sukubunga_bulanan, deltat, p, 1)
 functions.opsi("put", N, saham, 185, sukubunga_bulanan, deltat, p, 1)
 print("\n")
 
-# Metode Black Scholes
+# Metode Black-Scholes
 print("Menggunakan metode Black-Scholes, diperoleh: ")
-functions.black_scholes(S0, 115, deltat, volatility_bulanan, sukubunga_bulanan, "call", 1)
-functions.black_scholes(S0, 180, deltat, volatility_bulanan, sukubunga_bulanan, "call", 1)
-functions.black_scholes(S0, 150, deltat, volatility_bulanan, sukubunga_bulanan, "put", 1)
-functions.black_scholes(S0, 185, deltat, volatility_bulanan, sukubunga_bulanan, "put", 1)
+functions.black_scholes("call", S0, 115, deltat, volatility_bulanan, sukubunga_bulanan,  1)
+functions.black_scholes("call", S0, 180, deltat, volatility_bulanan, sukubunga_bulanan,  1)
+functions.black_scholes("put", S0, 150, deltat, volatility_bulanan, sukubunga_bulanan,  1)
+functions.black_scholes("put", S0, 185, deltat, volatility_bulanan, sukubunga_bulanan,  1)
 print("\n")
 
 # Metode Monte-Carlo
+print("Menggunakan metode Monte-Carlo, diperoleh: ")
+functions.monte_carlo( S0, 1, 30, deltat, drift_bulanan, volatility_bulanan, sukubunga_bulanan)
 
