@@ -1,7 +1,6 @@
 import numpy as np
 import math
 from scipy.stats import norm
-import random
 import matplotlib.pyplot as plt
 
 
@@ -148,9 +147,11 @@ def black_scholes(opsi, S, K, deltat, sigma, interest, t):
 
 
 def monte_carlo(S0, t, N, deltat, mu, sigma, interest):
+    """ Fungsi ini menghitung nilai harga opsi menggunakan Metode Monte-Carlo, serta plotting."""
     S_t_all = np.zeros((N+1, N+1))
     S_t = np.zeros(N+1)
     S_t[0] = S0
+    np.random.seed(127)
     for i in range(len(S_t_all)):
         S_t_all[i, 0]= S0
     payoff1 = np.zeros(N+1)
@@ -175,18 +176,21 @@ def monte_carlo(S0, t, N, deltat, mu, sigma, interest):
     f = 0
     S_t_vis = []
 
-    while len(S_t_vis) <= 10:
+    while len(S_t_vis) <= 20:
         if min(S_t_all[f]) > 0 and max(S_t_all[f]) < 1000:
             S_t_vis.append(S_t_all[f])
         f += 1
+    plt.title("Pergerakan Saham PEP dengan 20 Lintasan dengan Monte-Carlo")
+    plt.xlabel("t")
+    plt.ylabel("S(t)")
     for k in range(len(S_t_vis)):
         plt.plot(S_t_vis[k])
     plt.show()
 
-    harga_opsi1 = np.round(np.exp(-interest*deltat) * np.mean(payoff1), 4)
-    harga_opsi2 = np.round(np.exp(-interest * deltat) * np.mean(payoff2), 4)
-    harga_opsi3 = np.round(np.exp(-interest * deltat) * np.mean(payoff3), 4)
-    harga_opsi4 = np.round(np.exp(-interest * deltat) * np.mean(payoff4), 4)
+    harga_opsi1 = np.round(np.exp(-interest * N*deltat) * np.mean(payoff1), 4)
+    harga_opsi2 = np.round(np.exp(-interest * N*deltat) * np.mean(payoff2), 4)
+    harga_opsi3 = np.round(np.exp(-interest * N*deltat) * np.mean(payoff3), 4)
+    harga_opsi4 = np.round(np.exp(-interest * N*deltat) * np.mean(payoff4), 4)
 
     print(f"Harga opsi Call dengan periode {t} bulan dan Strike Price {K1} adalah {harga_opsi1}.")
     print(f"Harga opsi Call dengan periode {t} bulan dan Strike Price {K2} adalah {harga_opsi2}.")

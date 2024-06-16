@@ -20,6 +20,7 @@ S0 = 176.63
 
 drift_bulanan = functions.drift(df, 1, 1/252)
 volatility_bulanan = functions.volatility(df, 1, 1/252)
+print(drift_bulanan, volatility_bulanan)
 sukubunga_bulanan = functions.r(nominal_interest, 1)
 ufactor = functions.u(volatility_bulanan, deltat)
 dfactor = 1/ufactor
